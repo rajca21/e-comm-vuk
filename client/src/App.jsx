@@ -4,6 +4,8 @@ import AuthGate from './providers/AuthGate';
 import AdminRoute from './routes/AdminRoute';
 import GuestRoute from './routes/GuestRoute';
 
+import GlobalLoadingOverlay from './components/common/GlobalLoadingOverlay';
+
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -27,6 +29,8 @@ function NotFound() {
 export default function App() {
   return (
     <AuthGate>
+      <GlobalLoadingOverlay />
+
       <Routes>
         <Route path='/' element={<Home />} />
 
