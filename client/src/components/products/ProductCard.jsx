@@ -1,7 +1,12 @@
+import { Link } from 'react-router-dom';
+
 export default function ProductCard({ product }) {
   return (
     <article className='rounded-2xl border border-gray-100 bg-white p-4 shadow-sm'>
-      <div className='aspect-square w-full overflow-hidden rounded-xl bg-gray-100'>
+      <Link
+        to={`/products/${product.id}`}
+        className='block aspect-square w-full overflow-hidden rounded-xl bg-gray-100'
+      >
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
@@ -9,11 +14,16 @@ export default function ProductCard({ product }) {
             className='h-full w-full object-cover'
           />
         ) : null}
-      </div>
+      </Link>
 
       <div className='mt-3'>
         <div className='mb-1 flex items-center justify-between gap-2'>
-          <h3 className='text-sm font-semibold'>{product.name}</h3>
+          <Link
+            to={`/products/${product.id}`}
+            className='text-sm font-semibold hover:underline'
+          >
+            {product.name}
+          </Link>
           {product.category && (
             <span className='shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700'>
               {product.category}
@@ -29,9 +39,12 @@ export default function ProductCard({ product }) {
           <span className='text-base font-semibold'>
             €{Number(product.price).toFixed(2)}
           </span>
-          <button className='rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:opacity-95'>
-            Add to cart
-          </button>
+          <Link
+            to={`/products/${product.id}`}
+            className='rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:opacity-95'
+          >
+            View
+          </Link>
         </div>
       </div>
     </article>
