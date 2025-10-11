@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { FiShoppingCart, FiUser, FiSearch } from 'react-icons/fi';
+import { FiShoppingCart, FiUser } from 'react-icons/fi';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth';
+import SearchBar from '../search/SearchBar';
 
 export default function Navbar() {
   const [elevated, setElevated] = useState(false);
@@ -39,13 +40,8 @@ export default function Navbar() {
           </div>
 
           <div className='hidden md:flex md:flex-1 md:justify-center'>
-            <div className='relative w-full max-w-md'>
-              <FiSearch className='pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400' />
-              <input
-                type='text'
-                placeholder='Search products…'
-                className='w-full rounded-xl border border-gray-200 bg-white/80 pl-10 pr-4 py-2 outline-none ring-0 placeholder:text-gray-400 focus:border-gray-300 focus:bg-white shadow-sm'
-              />
+            <div className='w-full max-w-md'>
+              <SearchBar />
             </div>
           </div>
 

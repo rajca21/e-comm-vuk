@@ -119,10 +119,7 @@ export async function listProducts(req, res) {
 
   const where = q
     ? {
-        OR: [
-          { name: { contains: q, mode: 'insensitive' } },
-          { description: { contains: q, mode: 'insensitive' } },
-        ],
+        OR: [{ name: { contains: q } }, { description: { contains: q } }],
       }
     : {};
 
