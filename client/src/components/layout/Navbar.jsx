@@ -55,7 +55,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* search (desktop) */}
           <div className='hidden md:flex md:flex-1 md:justify-center'>
             <div className='relative w-full max-w-md'>
               <FiSearch className='pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400' />
@@ -67,7 +66,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* right controls */}
           <div className='flex items-center gap-2'>
             {authed ? (
               <>
@@ -75,7 +73,7 @@ export default function Navbar() {
                   {user?.name || user?.email}
                 </span>
                 <button
-                  onClick={() => logout()}
+                  onClick={logout}
                   className='rounded-xl px-3 py-2 text-sm hover:bg-gray-100'
                   title='Sign out'
                 >
@@ -118,7 +116,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* desktop nav links */}
         <div className='hidden lg:flex items-center justify-center gap-1 pb-3'>
           {navItems.map((item) => (
             <NavLink
@@ -138,7 +135,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* mobile drawer */}
       {open && (
         <div className='lg:hidden'>
           <div
@@ -164,7 +160,6 @@ export default function Navbar() {
             </div>
 
             <div className='px-4 pb-4'>
-              {/* search mobile */}
               <div className='relative mb-4'>
                 <FiSearch className='pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400' />
                 <input

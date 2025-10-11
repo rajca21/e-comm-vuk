@@ -5,7 +5,8 @@ import { useAuthStore } from '../stores/auth';
 
 export default function Register() {
   const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
+  const register = useAuthStore((s) => s.register);
+
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState(null);
 
@@ -13,10 +14,7 @@ export default function Register() {
     e.preventDefault();
     setError(null);
     try {
-      await login(
-        { email: form.email, password: form.password },
-        { mock: true }
-      );
+      await register(form);
       navigate('/', { replace: true });
     } catch (err) {
       setError(err?.message || 'Registration failed');
@@ -54,7 +52,7 @@ export default function Register() {
               onChange={(e) =>
                 setForm((s) => ({ ...s, email: e.target.value }))
               }
-              className='mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 outline-none focus:border-gray-300 shadow-sm'
+              className='mt-1 w-full rounded-XL border border-gray-200 px-3 py-2 outline-none focus:border-gray-300 shadow-sm'
               required
             />
           </div>

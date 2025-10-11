@@ -6,16 +6,17 @@ import { useAuthStore } from '../stores/auth';
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const login = useAuthStore((s) => s.login);
+
   const [email, setEmail] = useState('dev@example.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState(null);
-  const login = useAuthStore((s) => s.login);
 
   async function onSubmit(e) {
     e.preventDefault();
-    // setError(null);
+    setError(null);
     try {
-      await login({ email, password }, { mock: true });
+      await login({ email, password });
       const redirectTo = location.state?.from?.pathname || '/';
       navigate(redirectTo, { replace: true });
     } catch (err) {
