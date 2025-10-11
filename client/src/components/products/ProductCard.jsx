@@ -12,8 +12,16 @@ export default function ProductCard({ product }) {
       </div>
 
       <div className='mt-3'>
-        <h3 className='text-sm font-semibold'>{product.name}</h3>
-        <p className='mt-1 line-clamp-2 text-sm text-gray-600'>
+        <div className='mb-1 flex items-center justify-between gap-2'>
+          <h3 className='text-sm font-semibold'>{product.name}</h3>
+          {product.category && (
+            <span className='shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700'>
+              {product.category}
+            </span>
+          )}
+        </div>
+
+        <p className='line-clamp-2 text-sm text-gray-600'>
           {product.description || '—'}
         </p>
 

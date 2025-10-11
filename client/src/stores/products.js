@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../lib/api';
 
-// helper za query string (page, pageSize, q)
+// helper za query string (page, pageSize, q, category, sortBy, order)
 function qs(params = {}) {
   const s = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
@@ -34,6 +34,9 @@ export const useProductsStore = create((set, get) => ({
   total: 0,
   totalPages: 0,
   q: '',
+  category: '',
+  sortBy: 'createdAt', //  'createdAt' | 'price' | 'name'
+  order: 'desc', //  'asc' | 'desc'
   status: 'idle', // 'idle' | 'loading' | 'success' | 'error'
   error: null,
 
@@ -56,6 +59,16 @@ export const useProductsStore = create((set, get) => ({
   setPageSize(pageSize) {
     set({ pageSize: Math.min(50, Math.max(1, Number(pageSize) || 12)) });
   },
+  setCategory(category) {
+    set({ category: category || '' });
+  },
+  setSort(sortBy, order = 'desc') {
+    const s = ['createdAt', 'price', 'name'].includes(sortBy)
+      ? sortBy
+      : 'createdAt';
+    const o = order === 'asc' ? 'asc' : 'desc';
+    set({ sortBy: s, order: o });
+  },
 
   // PUBLIC: lista
   async fetchList(opts = {}) {
@@ -63,10 +76,15 @@ export const useProductsStore = create((set, get) => ({
     const page = opts.page ?? state.page;
     const pageSize = opts.pageSize ?? state.pageSize;
     const q = opts.q ?? state.q;
+    const category = opts.category ?? state.category;
+    const sortBy = opts.sortBy ?? state.sortBy;
+    const order = opts.order ?? state.order;
 
     set({ status: 'loading', error: null });
     try {
-      const data = await api.get(`/products${qs({ page, pageSize, q })}`);
+      const data = await api.get(
+        `/products${qs({ page, pageSize, q, category, sortBy, order })}`
+      );
       set({
         items: data.items ?? [],
         page: data.page ?? page,
@@ -109,6 +127,9 @@ export const useProductsStore = create((set, get) => ({
       total: 0,
       totalPages: 0,
       q: '',
+      category: '',
+      sortBy: 'createdAt',
+      order: 'desc',
       status: 'idle',
       error: null,
     });
@@ -116,7 +137,6 @@ export const useProductsStore = create((set, get) => ({
 
   // ===== ADMIN METODE =====
   // Create product (multipart/form-data)
-  // data: { name, price, description?, currency?, stock?, isActive?, image? (File) }
   async createProduct(data) {
     set({ adminStatus: 'loading', adminError: null });
     try {
