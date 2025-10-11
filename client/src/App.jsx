@@ -1,11 +1,17 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import AuthGate from './providers/AuthGate';
-import ProtectedRoute from './routes/ProtectedRoute';
+import AdminRoute from './routes/AdminRoute';
+import GuestRoute from './routes/GuestRoute';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UsersTab from './pages/admin/UsersTab';
+import ProductsTab from './pages/admin/ProductsTab';
+import OrdersTab from './pages/admin/OrdersTab';
 
 function NotFound() {
   return (
@@ -22,16 +28,22 @@ export default function App() {
   return (
     <AuthGate>
       <Routes>
-        {/* Public routes */}
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
+        <Route path='/' element={<Home />} />
 
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path='/' element={<Home />} />
+        <Route element={<GuestRoute />}>
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
         </Route>
 
-        {/* 404 */}
+        <Route element={<AdminRoute />}>
+          <Route path='/admin' element={<AdminDashboard />}>
+            <Route index element={<Navigate to='users' replace />} />
+            <Route path='users' element={<UsersTab />} />
+            <Route path='products' element={<ProductsTab />} />
+            <Route path='orders' element={<OrdersTab />} />
+          </Route>
+        </Route>
+
         <Route path='*' element={<NotFound />} />
       </Routes>
     </AuthGate>
