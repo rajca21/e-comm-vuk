@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { useProductsStore } from '../stores/products';
+import { useCartStore } from '../stores/cart';
 import {
   FiMinus,
   FiPlus,
@@ -13,6 +14,7 @@ export default function ProductDetails() {
   const { id } = useParams();
   const { current, currentStatus, currentError, fetchOne, clearCurrent } =
     useProductsStore();
+  const addCart = useCartStore((s) => s.add);
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
@@ -29,8 +31,8 @@ export default function ProductDetails() {
   }
 
   function addToCart() {
-    console.log('Add to cart:', { productId: current?.id, qty });
-    alert('Added to cart (demo)');
+    if (!current) return;
+    addCart(current, qty);
   }
 
   const loading = currentStatus === 'loading';

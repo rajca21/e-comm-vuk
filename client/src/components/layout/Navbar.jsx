@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FiShoppingCart, FiUser } from 'react-icons/fi';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth';
+import { useCartStore } from '../../stores/cart';
 import SearchBar from '../search/SearchBar';
 
 export default function Navbar() {
@@ -10,6 +11,7 @@ export default function Navbar() {
   const status = useAuthStore((s) => s.status);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const cartCount = useCartStore((s) => s.count());
 
   useEffect(() => {
     const onScroll = () => setElevated(window.scrollY > 4);
@@ -81,9 +83,11 @@ export default function Navbar() {
                       title='Cart'
                     >
                       <FiShoppingCart className='h-6 w-6' />
-                      <span className='absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-gray-900 text-xs font-semibold text-white shadow'>
-                        2
-                      </span>
+                      {!!cartCount && (
+                        <span className='absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-gray-900 px-1 text-xs font-semibold text-white shadow'>
+                          {cartCount}
+                        </span>
+                      )}
                     </NavLink>
                   </>
                 )}
