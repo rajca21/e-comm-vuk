@@ -24,6 +24,7 @@ export async function createProduct(req, res) {
       currency = 'EUR',
       stock = 0,
       isActive = true,
+      category = null,
     } = req.body;
 
     if (!name || !price) {
@@ -45,12 +46,12 @@ export async function createProduct(req, res) {
         imageUrl,
         stock: Number(stock) || 0,
         isActive: Boolean(isActive),
+        category: category || null,
       },
     });
 
     return res.status(201).json(product);
   } catch (e) {
-    // Prisma unique error
     if (e.code === 'P2002' && e.meta?.target?.includes('name')) {
       return res.status(409).json({ message: 'Product name must be unique' });
     }
@@ -59,13 +60,13 @@ export async function createProduct(req, res) {
   }
 }
 
-// PUT /api/products/:id  (ADMIN) - kompletno ažuriranje (ili koristi PATCH, ista logika)
+// PUT /api/products/:id  (ADMIN)
 export async function updateProduct(req, res) {
   try {
     const id = Number(req.params.id);
-    const { name, description, price, currency, stock, isActive } = req.body;
+    const { name, description, price, currency, stock, isActive, category } =
+      req.body;
 
-    // ako stiže nova slika → upload
     let imageData = {};
     if (req.file) {
       const result = await uploadBufferToCloudinary(req.file.buffer);
@@ -81,6 +82,7 @@ export async function updateProduct(req, res) {
         ...(currency !== undefined ? { currency } : {}),
         ...(stock !== undefined ? { stock: Number(stock) } : {}),
         ...(isActive !== undefined ? { isActive: Boolean(isActive) } : {}),
+        ...(category !== undefined ? { category: category || null } : {}), // NEW
         ...imageData,
       },
     });
@@ -111,22 +113,34 @@ export async function deleteProduct(req, res) {
   }
 }
 
-// GET /api/products  (PUBLIC) — sa osnovnim paginiranjem i pretragom
+// GET /api/products  (PUBLIC) — paginacija, pretraga, kategorija, sortiranje
 export async function listProducts(req, res) {
   const page = Math.max(1, Number(req.query.page) || 1);
   const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 12));
-  const q = (req.query.q || '').toString().trim();
 
-  const where = q
-    ? {
-        OR: [{ name: { contains: q } }, { description: { contains: q } }],
-      }
-    : {};
+  const q = (req.query.q || '').toString().trim();
+  const category = (req.query.category || '').toString().trim(); // NEW
+
+  const sortBy = (req.query.sortBy || 'createdAt').toString();
+  const order = (req.query.order || 'desc').toString().toLowerCase();
+
+  const allowedSort = new Set(['createdAt', 'price', 'name']);
+  const sortField = allowedSort.has(sortBy) ? sortBy : 'createdAt';
+  const sortOrder = order === 'asc' ? 'asc' : 'desc';
+
+  const where = {
+    ...(q
+      ? {
+          OR: [{ name: { contains: q } }, { description: { contains: q } }],
+        }
+      : {}),
+    ...(category ? { category } : {}),
+  };
 
   const [items, total] = await Promise.all([
     prisma.product.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { [sortField]: sortOrder },
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
