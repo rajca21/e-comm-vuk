@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import authRoutes from './routes/auth.routes.js';
+import productRoutes from './routes/product.routes.js';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Not found' }));
 
