@@ -7,6 +7,7 @@ import GuestRoute from './routes/GuestRoute';
 import GlobalLoadingOverlay from './components/common/GlobalLoadingOverlay';
 
 import Home from './pages/Home';
+import Products from './pages/Products';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -33,6 +34,7 @@ export default function App() {
 
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/products' element={<Products />} />
 
         <Route element={<GuestRoute />}>
           <Route path='/login' element={<Login />} />
