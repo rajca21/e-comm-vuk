@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useCartStore } from '../../stores/cart';
 
 export default function ProductCard({ product }) {
+  const add = useCartStore((s) => s.add);
+
   return (
     <article className='rounded-2xl border border-gray-100 bg-white p-4 shadow-sm'>
       <Link
@@ -39,12 +42,21 @@ export default function ProductCard({ product }) {
           <span className='text-base font-semibold'>
             €{Number(product.price).toFixed(2)}
           </span>
-          <Link
-            to={`/products/${product.id}`}
-            className='rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:opacity-95'
-          >
-            View
-          </Link>
+          <div className='flex gap-2'>
+            <button
+              onClick={() => add(product, 1)}
+              className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm hover:bg-gray-50'
+              title='Add to cart'
+            >
+              Add to Cart
+            </button>
+            <Link
+              to={`/products/${product.id}`}
+              className='rounded-xl bg-gray-900 px-3 py-2 text-sm font-medium text-white shadow hover:opacity-95'
+            >
+              View
+            </Link>
+          </div>
         </div>
       </div>
     </article>
