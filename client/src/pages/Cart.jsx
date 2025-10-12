@@ -1,18 +1,14 @@
+import { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { useCartStore } from '../stores/cart';
-import { useAuthStore } from '../stores/auth';
-import { FiPlus, FiMinus, FiTrash2 } from 'react-icons/fi';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useShallow } from 'zustand/react/shallow';
 import { useOrdersStore } from '../stores/orders';
-import { useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { FiPlus, FiMinus, FiTrash2 } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { loadCountries } from '../lib/countries';
 
 export default function Cart() {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const status = useAuthStore((s) => s.status);
-  const isAuthed = status === 'authenticated';
 
   const { items, inc, dec, setQty, remove, clear } = useCartStore(
     useShallow((s) => ({
@@ -24,12 +20,34 @@ export default function Cart() {
       clear: s.clear,
     }))
   );
+
   const subtotal = useCartStore((s) =>
     s.items.reduce((sum, it) => sum + Number(it.price) * it.quantity, 0)
   );
 
   const createOrder = useOrdersStore((s) => s.createOrder);
   const mutateStatus = useOrdersStore((s) => s.mutateStatus);
+
+  const [countries, setCountries] = useState([]);
+  const [countriesStatus, setCountriesStatus] = useState('idle');
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setCountriesStatus('loading');
+      try {
+        const list = await loadCountries();
+        if (!mounted) return;
+        setCountries(list);
+        setCountriesStatus('success');
+      } catch {
+        setCountriesStatus('error');
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const [ship, setShip] = useState({
     shippingName: '',
@@ -164,131 +182,109 @@ export default function Cart() {
               <span className='font-semibold'>€{subtotal.toFixed(2)}</span>
             </div>
 
-            {!isAuthed ? (
-              <div className='mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4'>
-                <p className='text-sm text-gray-700'>
-                  To place your order, please sign in to your account.
-                </p>
-                <div className='mt-3 flex gap-2'>
-                  <Link
-                    to='/login'
-                    state={{ from: location }}
-                    className='rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:opacity-95'
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    to='/register'
-                    state={{ from: location }}
-                    className='rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm hover:bg-gray-50'
-                  >
-                    Create account
-                  </Link>
+            <form onSubmit={handleCheckout} className='mt-6 grid gap-3'>
+              <div className='grid gap-2'>
+                <label className='text-sm font-medium'>Full name *</label>
+                <input
+                  className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
+                  value={ship.shippingName}
+                  onChange={(e) =>
+                    setShip((s) => ({ ...s, shippingName: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className='grid gap-2'>
+                <label className='text-sm font-medium'>Address line 1 *</label>
+                <input
+                  className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
+                  value={ship.shippingAddress1}
+                  onChange={(e) =>
+                    setShip((s) => ({ ...s, shippingAddress1: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className='grid gap-2'>
+                <label className='text-sm font-medium'>Address line 2</label>
+                <input
+                  className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
+                  value={ship.shippingAddress2}
+                  onChange={(e) =>
+                    setShip((s) => ({ ...s, shippingAddress2: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className='grid grid-cols-2 gap-3'>
+                <div className='grid gap-2'>
+                  <label className='text-sm font-medium'>City *</label>
+                  <input
+                    className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
+                    value={ship.shippingCity}
+                    onChange={(e) =>
+                      setShip((s) => ({ ...s, shippingCity: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className='grid gap-2'>
+                  <label className='text-sm font-medium'>ZIP *</label>
+                  <input
+                    className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
+                    value={ship.shippingZip}
+                    onChange={(e) =>
+                      setShip((s) => ({ ...s, shippingZip: e.target.value }))
+                    }
+                  />
                 </div>
               </div>
-            ) : (
-              <form onSubmit={handleCheckout} className='mt-6 grid gap-3'>
-                <div className='grid gap-2'>
-                  <label className='text-sm font-medium'>Full name *</label>
-                  <input
-                    className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
-                    value={ship.shippingName}
-                    onChange={(e) =>
-                      setShip((s) => ({ ...s, shippingName: e.target.value }))
-                    }
-                  />
-                </div>
 
-                <div className='grid gap-2'>
-                  <label className='text-sm font-medium'>
-                    Address line 1 *
-                  </label>
-                  <input
-                    className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
-                    value={ship.shippingAddress1}
-                    onChange={(e) =>
-                      setShip((s) => ({
-                        ...s,
-                        shippingAddress1: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className='grid gap-2'>
-                  <label className='text-sm font-medium'>Address line 2</label>
-                  <input
-                    className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
-                    value={ship.shippingAddress2}
-                    onChange={(e) =>
-                      setShip((s) => ({
-                        ...s,
-                        shippingAddress2: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className='grid grid-cols-2 gap-3'>
-                  <div className='grid gap-2'>
-                    <label className='text-sm font-medium'>City *</label>
-                    <input
-                      className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
-                      value={ship.shippingCity}
-                      onChange={(e) =>
-                        setShip((s) => ({ ...s, shippingCity: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className='grid gap-2'>
-                    <label className='text-sm font-medium'>ZIP *</label>
-                    <input
-                      className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
-                      value={ship.shippingZip}
-                      onChange={(e) =>
-                        setShip((s) => ({ ...s, shippingZip: e.target.value }))
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className='grid gap-2'>
-                  <label className='text-sm font-medium'>Country *</label>
-                  <input
-                    className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
-                    value={ship.shippingCountry}
-                    onChange={(e) =>
-                      setShip((s) => ({
-                        ...s,
-                        shippingCountry: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className='grid gap-2'>
-                  <label className='text-sm font-medium'>Note</label>
-                  <textarea
-                    rows={3}
-                    className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
-                    value={ship.note}
-                    onChange={(e) =>
-                      setShip((s) => ({ ...s, note: e.target.value }))
-                    }
-                  />
-                </div>
-
-                <button
-                  type='submit'
-                  disabled={mutateStatus === 'loading'}
-                  className='mt-2 w-full rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:opacity-95 disabled:opacity-50'
+              <div className='grid gap-2'>
+                <label className='text-sm font-medium'>Country *</label>
+                <select
+                  value={ship.shippingCountry}
+                  onChange={(e) =>
+                    setShip((s) => ({ ...s, shippingCountry: e.target.value }))
+                  }
+                  className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300 shadow-sm'
+                  disabled={countriesStatus === 'loading'}
                 >
-                  {mutateStatus === 'loading'
-                    ? 'Placing order…'
-                    : 'Place order'}
-                </button>
-              </form>
-            )}
+                  {countriesStatus === 'loading' && (
+                    <option value=''>Loading countries…</option>
+                  )}
+                  {countriesStatus !== 'loading' && (
+                    <>
+                      <option value=''>Select a country</option>
+                      {countries.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </>
+                  )}
+                </select>
+              </div>
+
+              <div className='grid gap-2'>
+                <label className='text-sm font-medium'>Note</label>
+                <textarea
+                  rows={3}
+                  className='rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-gray-300'
+                  value={ship.note}
+                  onChange={(e) =>
+                    setShip((s) => ({ ...s, note: e.target.value }))
+                  }
+                />
+              </div>
+
+              <button
+                type='submit'
+                disabled={mutateStatus === 'loading'}
+                className='mt-2 w-full rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow hover:opacity-95 disabled:opacity-50'
+              >
+                {mutateStatus === 'loading' ? 'Placing order…' : 'Place order'}
+              </button>
+            </form>
 
             <button
               onClick={clear}
