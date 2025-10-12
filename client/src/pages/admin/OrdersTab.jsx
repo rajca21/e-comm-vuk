@@ -81,7 +81,6 @@ export default function OrdersTab() {
       page: 1,
       pageSize,
       status: statusFilter,
-      userId: userIdFilter || undefined,
     });
   }
   function changePage(n) {
@@ -91,7 +90,6 @@ export default function OrdersTab() {
       page: nn,
       pageSize,
       status: statusFilter,
-      userId: userIdFilter || undefined,
     });
   }
   function changePageSize(ps) {
@@ -101,7 +99,6 @@ export default function OrdersTab() {
       page: 1,
       pageSize: ps,
       status: statusFilter,
-      userId: userIdFilter || undefined,
     });
   }
 
