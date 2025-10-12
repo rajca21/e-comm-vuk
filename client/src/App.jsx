@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import AuthGate from './providers/AuthGate';
 import AdminRoute from './routes/AdminRoute';
+import ProtectedRoute from './routes/ProtectedRoute';
 import GuestRoute from './routes/GuestRoute';
 
 import GlobalLoadingOverlay from './components/common/GlobalLoadingOverlay';
@@ -11,6 +12,7 @@ import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import OrderDetails from './pages/OrderDetails';
+import Account from './pages/Account';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -41,6 +43,11 @@ export default function App() {
         <Route path='/products/:id' element={<ProductDetails />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/orders/:id' element={<OrderDetails />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path='/orders/:id' element={<OrderDetails />} />
+          <Route path='/account' element={<Account />} />
+        </Route>
 
         <Route element={<GuestRoute />}>
           <Route path='/login' element={<Login />} />
