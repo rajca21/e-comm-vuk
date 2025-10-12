@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FiEdit2, FiPlus, FiSearch, FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiPlus, FiSearch, FiTrash2, FiTag } from 'react-icons/fi';
 import { useProductsStore } from '../../stores/products';
 import ProductForm from './components/ProductForm';
 
@@ -118,17 +118,35 @@ export default function ProductsTab() {
                 </div>
               )}
             </div>
+
             <div className='min-w-0 flex-1'>
               <div className='flex items-start justify-between gap-2'>
-                <h3 className='truncate font-semibold'>{p.name}</h3>
+                <div className='min-w-0'>
+                  <h3 className='truncate font-semibold'>{p.name}</h3>
+                  {p.category ? (
+                    <div className='mt-1 inline-flex items-center gap-1 text-xs text-gray-600'>
+                      <FiTag className='h-3.5 w-3.5' />
+                      <span className='rounded-full bg-gray-100 px-2 py-0.5'>
+                        {p.category}
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
                 <span className='shrink-0 rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white shadow'>
                   €{Number(p.price).toFixed(2)}
                 </span>
               </div>
-              <p className='mt-1 line-clamp-2 text-sm text-gray-600'>
+
+              <p className='mt-2 line-clamp-2 text-sm text-gray-600'>
                 {p.description || '—'}
               </p>
-              <div className='mt-2 flex items-center gap-2 text-xs text-gray-600'>
+
+              <div className='mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-600'>
+                {p.category && (
+                  <span className='rounded-full bg-gray-100 px-2 py-0.5'>
+                    {p.category}
+                  </span>
+                )}
                 <span className='rounded-full bg-gray-100 px-2 py-0.5'>
                   Stock: {p.stock}
                 </span>

@@ -1,6 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FiX } from 'react-icons/fi';
 
+const CATEGORY_SUGGESTIONS = [
+  'Phones',
+  'Tablets',
+  'Laptops',
+  'Monitors',
+  'Headphones',
+  'Keyboards',
+  'Mice',
+  'Audio',
+  'Smart Home',
+  'Accessories',
+];
+
 export default function ProductForm({
   title = 'New product',
   submitLabel = 'Create',
@@ -15,6 +28,7 @@ export default function ProductForm({
     currency: 'EUR',
     stock: 0,
     isActive: true,
+    category: '',
   });
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState('');
@@ -28,6 +42,7 @@ export default function ProductForm({
         currency: initial.currency ?? 'EUR',
         stock: initial.stock ?? 0,
         isActive: initial.isActive ?? true,
+        category: initial.category ?? '',
       });
       setPreview(initial.imageUrl || '');
       setImageFile(null);
@@ -131,6 +146,25 @@ export default function ProductForm({
               onChange={handleChange}
               className='mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 outline-none focus:border-gray-300 shadow-sm'
             />
+          </div>
+
+          <div>
+            <label className='text-sm font-medium text-gray-700'>
+              Category
+            </label>
+            <input
+              name='category'
+              list='category-suggestions'
+              value={form.category}
+              onChange={handleChange}
+              placeholder='e.g. Laptops'
+              className='mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 outline-none focus:border-gray-300 shadow-sm'
+            />
+            <datalist id='category-suggestions'>
+              {CATEGORY_SUGGESTIONS.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
           </div>
 
           <div className='flex items-center gap-2'>
