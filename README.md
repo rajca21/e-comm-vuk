@@ -110,3 +110,5 @@ Backend: http://localhost:8000
 | `npx prisma:migrate`  | Pokreće migracije             |
 | `npx prisma:generate` | Generiše Prisma klijenta      |
 | `npx prisma:seed`     | Popunjava bazu sa proizvodima |
+
+---
